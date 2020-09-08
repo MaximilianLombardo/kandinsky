@@ -1,9 +1,10 @@
+observe()
 vln_ctrl_row_ui <- fluidRow(
     column(
         width = 3,
         selectizeInput("vlnFeatures",
                        label = "QC Violin Plot Features",
-                       choices = colnames(obj@meta.data),
+                       choices = colnames(obj()@meta.data),
                        selected = c("nCount_RNA"),
                        multiple = TRUE,
                        width = "100%")),
@@ -11,8 +12,9 @@ vln_ctrl_row_ui <- fluidRow(
         width = 3,
         selectizeInput("vlnSplit",
                        label = "QC Violin Plot Grouping Variable",
-                       choices = colnames(obj@meta.data),
-                       multiple = TRUE,
+                       choices = colnames(obj()@meta.data),
+                       selected = c("orig.ident"),
+                       multiple = FALSE,
                        width = "100%"))
 )
 ################################################
@@ -32,36 +34,36 @@ dimPlot_ctrl_row_ui <- fluidRow(
         width = 2,
         selectizeInput("dimPlotReduction",
                        label = "Dim Plot Reduction",
-                       choices = names(obj@reductions),
+                       choices = names(obj()@reductions),
                        multiple = FALSE,
                        width = "100%")),
     column(
         width = 2,
         selectizeInput("dimPlotGroup",
                        label = "Grouping Variable",
-                       choices = colnames(obj@meta.data),
+                       choices = colnames(obj()@meta.data),
                        multiple = FALSE,
                        width = "100%")),
     column(
         width = 2,
         selectizeInput("dimPlotSplit",
                        label = "Splitting Variable",
-                       choices = colnames(obj@meta.data),
+                       choices = colnames(obj()@meta.data),
                        multiple = FALSE,
                        width = "100%")),
     column(
         width = 3,
         selectizeInput("featurePlotFeature",
                        label = "Gene to Plot",
-                       choices = rownames(obj[["RNA"]]@counts),#Change to handle other slots later
-                       selected = obj[["RNA"]]@var.features[1],
+                       choices = NULL,#rownames(obj()[["RNA"]]@counts),#Change to handle other slots later
+                       selected = VariableFeatures(obj())[1],
                        multiple = TRUE,
                        width = "100%")),
     column(
         width = 3,
         selectizeInput("featurePlotSlot",
                        label = "Normalization Method",
-                       choices = names(pbmc_small@assays),#Change to handle other slots later
+                       choices = names(obj()@assays),#Change to handle other slots later
                        selected = c("RNA"),
                        multiple = FALSE,
                        width = "100%"))

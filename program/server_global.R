@@ -30,7 +30,8 @@ suppressPackageStartupMessages(library(RColorBrewer))
 suppressPackageStartupMessages(library(Seurat))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(DT))
-suppressPackageStartupMessages(library(schex))#new
+suppressPackageStartupMessages(library(SingleCellSignalR))#Cell signalling networks
+suppressPackageStartupMessages(library(schex))#Hex/binned expression values
 
 
 if (packageVersion("Seurat") < "3.0.0") { stop("Need to upgrade Seurat to >= version 3.0.0") }

@@ -1,7 +1,17 @@
 # ----------------------
 # Misc Functions
 # ---------------------
+round_df <- function(x, digits) {
+    # round all numeric variables
+    # x: data frame 
+    # digits: number of digits to round
+    numeric_columns <- sapply(x, mode) == 'numeric'
+    x[numeric_columns] <-  round(x[numeric_columns], digits)
+    x
+}
 
+
+################
 check_panel_plot_columns <- function(genelist, panel_plot_columns) {
     is_valid <- TRUE
     value    <- 0

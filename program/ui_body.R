@@ -212,4 +212,6 @@ body2 <- box(id          = "bodyElement2",
 
 # -- Register Elements in the ORDER SHOWN in the UI
 add_ui_body(list(loading_modal, file_error_modal, body1, body2))
+#add_ui_body(list(loading_modal, file_error_modal, body1))
+
 #add_ui_body()

@@ -33,106 +33,108 @@ load_data <- function(file) {
             error_messages[[g_error_field]] <<- get_file_upload_error_message(file, e$message)
         }
     })
-
-    if (is.null(error_messages[[g_error_field]])) {
-        if (is.null(object)) {
-            error_messages[[g_error_field]] <- get_file_upload_error_message(file, "is empty.")
-        }
-        else if (tolower(class(object)) != "seurat") {
-            error_messages[[g_error_field]] <- get_file_upload_error_message(file, "should be a Seurat object.")
-        }
-        else if (substr(object@version, 1, 1) != "3") {
-            error_messages[[g_error_field]] <- get_file_upload_error_message(file, "should be a Seurat version 3 object.")
-        }
-        else {
-            meta_info         <- object@misc$meta.info
-            meta_fields_top   <- c("Title", "Authors", "Publication", "Summary")
-            meta_fields_table <- setdiff(names(meta_info), meta_fields_top)
-            meta_info_top     <- meta_info[meta_fields_top]
-
-            # Check required fields
-            meta_fields_required <- meta_fields_top[1]
-            for (field in meta_fields_required) {
-                error_messages <- check_required_field(error_messages, object@misc$meta.info[field], paste(field, paste0("(@misc$meta.info$", field, ")")))
-            }
-            for (field in c("top10", "top30")) {
-                error_messages    <- check_required_field(error_messages, object@misc$DE[field], paste(field, paste0("(@misc$DE$", field, ")")))
-            }
-            error_messages    <- check_required_field(error_messages, colnames(object), "Cellnames (colnames(object))", check_type = "empty")
-            error_messages    <- check_required_field(error_messages, Embeddings(object, reduction = "tsne"), "Dimensionality Reduction (Embeddings(object, reduction = 'tsne'))")
-            error_messages    <- check_required_field(error_messages, object@active.ident, "Ident (@ident)")
-            error_messages    <- check_required_field(error_messages, object@active.assay, "Assay (@assay)")
-            error_messages    <- check_required_field(error_messages, GetAssayData(object), "Data (GetAssayData(object))")
-
-            # Data segregation fields should match with meta_data
-            data_segregation <- object@misc$DataSegregation
-            if (!is.null(data_segregation)) {
-                fields <- names(data_segregation)
-                meta_fields <- colnames(object@meta.data)
-                if (!identical(setdiff(fields, meta_fields), character(0))) {
-                    error_messages[[g_error_field]] <- get_file_upload_error_message(file, "Data segregation fields doesn't match with meta data fields.")
-                } else {
-                    result$filter_list <- data_segregation
-                    result$metadata    <- object@meta.data[, fields, drop = FALSE]
-                }
-            }
-
-            if (length(error_messages) == 0) {
-                result$seurat     <- object
-                result$tsne       <- as.data.frame(Embeddings(object, reduction = "tsne"))
-                result$tsne$Cell  <- rownames(result$tsne)
-
-                result$cells      <- colnames(object)
-                result$genes      <- sort(rownames(object))
-                result$clusters   <- data.frame("Cluster" = as.factor(object@active.ident),
-                                                "Cell"    = result$cells,
-                                                stringsAsFactors = F)
-
-                result$clustOrder <- unique(result$clusters$Cluster)
-                if (is.factor(result$clustOrder)) {
-                    result$clustOrder <- levels(result$clustOrder)
-                }
-
-                result$expression <- future({avg.ex.scale(object) %>% as.data.frame()}, stdout = FALSE)
-                result$detection  <- future({local_AverageDetectionRate(object) %>% as.data.frame()}, stdout = FALSE)
-
-                result$meta       <- list(object_name = gsub("\\..*", "", file$name),
-                                          title       = meta_info_top$Title,
-                                          author      = meta_info_top$Authors,
-                                          publication = meta_info_top$Publication,
-                                          summary     = meta_info_top$Summary,
-                                          cells       = length(result$cells),
-                                          genes       = length(result$genes),
-                                          clusters    = levels(result$clusters$Cluster),
-                                          top10       = object@misc$DE$top10,
-                                          top30       = object@misc$DE$top30)
-
-                result$meta$table <- meta_info[meta_fields_table]
-                result$meta$table <- result$meta$table[!is.na(result$meta$table) & result$meta$table != "NA" & result$meta$table != ""]
-
-                # setup colors for the clusters globally
-                nClusters <- nlevels(result$clusters$Cluster)
-                set1_max_colors <- 9
-
-                # if nClusters is larger than the max colors supported by the palette, interpolate colors
-                if (nClusters > set1_max_colors) {
-                    get_palette  <- colorRampPalette(brewer.pal(set1_max_colors, "Dark2"))
-                    cluster.cols <- get_palette(nClusters)
-                } else {
-                    cluster.cols <- brewer.pal(nClusters, "Dark2")
-                }
-                result$colorKey <- list("Cluster" = list())
-                for (l in levels(result$clusters$Cluster)) {
-                    result$colorKey[["Cluster"]][l] = cluster.cols[which(levels(result$clusters$Cluster) == l)]
-                }
-            }
-        }
-    }
-    if (length(error_messages) == 0) {
-        result <- list(errors = NULL, object = result)
-    } else {
-        result <- list(errors = error_messages, object = NULL)
-    }
+    
+    result$seurat <- object
+    
+    # if (is.null(error_messages[[g_error_field]])) {
+    #     if (is.null(object)) {
+    #         error_messages[[g_error_field]] <- get_file_upload_error_message(file, "is empty.")
+    #     }
+    #     else if (tolower(class(object)) != "seurat") {
+    #         error_messages[[g_error_field]] <- get_file_upload_error_message(file, "should be a Seurat object.")
+    #     }
+    #     else if (substr(object@version, 1, 1) != "3") {
+    #         error_messages[[g_error_field]] <- get_file_upload_error_message(file, "should be a Seurat version 3 object.")
+    #     }
+    #     else {
+    #         meta_info         <- object@misc$meta.info
+    #         meta_fields_top   <- c("Title", "Authors", "Publication", "Summary")
+    #         meta_fields_table <- setdiff(names(meta_info), meta_fields_top)
+    #         meta_info_top     <- meta_info[meta_fields_top]
+    # 
+    #         # Check required fields
+    #         meta_fields_required <- meta_fields_top[1]
+    #         for (field in meta_fields_required) {
+    #             error_messages <- check_required_field(error_messages, object@misc$meta.info[field], paste(field, paste0("(@misc$meta.info$", field, ")")))
+    #         }
+    #         for (field in c("top10", "top30")) {
+    #             error_messages    <- check_required_field(error_messages, object@misc$DE[field], paste(field, paste0("(@misc$DE$", field, ")")))
+    #         }
+    #         error_messages    <- check_required_field(error_messages, colnames(object), "Cellnames (colnames(object))", check_type = "empty")
+    #         error_messages    <- check_required_field(error_messages, Embeddings(object, reduction = "tsne"), "Dimensionality Reduction (Embeddings(object, reduction = 'tsne'))")
+    #         error_messages    <- check_required_field(error_messages, object@active.ident, "Ident (@ident)")
+    #         error_messages    <- check_required_field(error_messages, object@active.assay, "Assay (@assay)")
+    #         error_messages    <- check_required_field(error_messages, GetAssayData(object), "Data (GetAssayData(object))")
+    # 
+    #         # Data segregation fields should match with meta_data
+    #         data_segregation <- object@misc$DataSegregation
+    #         if (!is.null(data_segregation)) {
+    #             fields <- names(data_segregation)
+    #             meta_fields <- colnames(object@meta.data)
+    #             if (!identical(setdiff(fields, meta_fields), character(0))) {
+    #                 error_messages[[g_error_field]] <- get_file_upload_error_message(file, "Data segregation fields doesn't match with meta data fields.")
+    #             } else {
+    #                 result$filter_list <- data_segregation
+    #                 result$metadata    <- object@meta.data[, fields, drop = FALSE]
+    #             }
+    #         }
+    # 
+    #         if (length(error_messages) == 0) {
+    #             result$seurat     <- object
+    #             result$tsne       <- as.data.frame(Embeddings(object, reduction = "tsne"))
+    #             result$tsne$Cell  <- rownames(result$tsne)
+    # 
+    #             result$cells      <- colnames(object)
+    #             result$genes      <- sort(rownames(object))
+    #             result$clusters   <- data.frame("Cluster" = as.factor(object@active.ident),
+    #                                             "Cell"    = result$cells,
+    #                                             stringsAsFactors = F)
+    # 
+    #             result$clustOrder <- unique(result$clusters$Cluster)
+    #             if (is.factor(result$clustOrder)) {
+    #                 result$clustOrder <- levels(result$clustOrder)
+    #             }
+    # 
+    #             result$expression <- future({avg.ex.scale(object) %>% as.data.frame()}, stdout = FALSE)
+    #             result$detection  <- future({local_AverageDetectionRate(object) %>% as.data.frame()}, stdout = FALSE)
+    # 
+    #             result$meta       <- list(object_name = gsub("\\..*", "", file$name),
+    #                                       title       = meta_info_top$Title,
+    #                                       author      = meta_info_top$Authors,
+    #                                       publication = meta_info_top$Publication,
+    #                                       summary     = meta_info_top$Summary,
+    #                                       cells       = length(result$cells),
+    #                                       genes       = length(result$genes),
+    #                                       clusters    = levels(result$clusters$Cluster),
+    #                                       top10       = object@misc$DE$top10,
+    #                                       top30       = object@misc$DE$top30)
+    # 
+    #             result$meta$table <- meta_info[meta_fields_table]
+    #             result$meta$table <- result$meta$table[!is.na(result$meta$table) & result$meta$table != "NA" & result$meta$table != ""]
+    # 
+    #             # setup colors for the clusters globally
+    #             nClusters <- nlevels(result$clusters$Cluster)
+    #             set1_max_colors <- 9
+    # 
+    #             # if nClusters is larger than the max colors supported by the palette, interpolate colors
+    #             if (nClusters > set1_max_colors) {
+    #                 get_palette  <- colorRampPalette(brewer.pal(set1_max_colors, "Dark2"))
+    #                 cluster.cols <- get_palette(nClusters)
+    #             } else {
+    #                 cluster.cols <- brewer.pal(nClusters, "Dark2")
+    #             }
+    #             result$colorKey <- list("Cluster" = list())
+    #             for (l in levels(result$clusters$Cluster)) {
+    #                 result$colorKey[["Cluster"]][l] = cluster.cols[which(levels(result$clusters$Cluster) == l)]
+    #             }
+    #         }
+    #     }
+    # }
+    # if (length(error_messages) == 0) {
+    #     result <- list(errors = NULL, object = result)
+    # } else {
+    #     result <- list(errors = error_messages, object = NULL)
+    # }
     result
 }
 

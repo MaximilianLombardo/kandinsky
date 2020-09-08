@@ -29,7 +29,7 @@ sidebar_header <- tags$div(useShinyjs())
 file_input <- tags$div(
     style = "margin-top:20px;margin-bottom:25px;",
     align = "center",
-    fileInput(inputId = "fileInputDialog",
+    fileInput(inputId = "objectInput",#"fileInputDialog",
               label   = NULL,
               buttonLabel = "Load New Data Object",
               width   = "80%"))

@@ -27,6 +27,8 @@
 
 
 # -- VARIABLES --
+#obj <- NULL
+
 userData <- reactiveValues()
     userData$object              <- NULL
     userData$objectId            <- 0
@@ -52,13 +54,13 @@ userSel <- reactiveValues()
     userSel$runDiffCalc          <- FALSE
 
 # -- FUNCTIONS --
-disable_plots <- function() {
-    userSel$runScatterPlot <- FALSE
-    userSel$runViolinPlot  <- FALSE
-    userSel$runDotPlot     <- FALSE
-    userSel$runHeatmap     <- FALSE
-    userSel$runDiffCalc    <- FALSE
-}
+# disable_plots <- function() {
+#     userSel$runScatterPlot <- FALSE
+#     userSel$runViolinPlot  <- FALSE
+#     userSel$runDotPlot     <- FALSE
+#     userSel$runHeatmap     <- FALSE
+#     userSel$runDiffCalc    <- FALSE
+# }
 
 filtered_data <- reactive({
     result  <- userData$object
@@ -136,109 +138,109 @@ filtered_data <- reactive({
     result
 })
 
-top10_genes <- reactive({
-    get_top_genes_data(userData$object, "top10")
-})
-
-top30_genes <- reactive({
-    get_top_genes_data(userData$object, "top30")
-})
-
-differentials_table_content <- reactive({
-    c1 <- userSel$diffCluster1
-    s1 <- userSel$diffClusterCells1
-    c2 <- userSel$diffCluster2
-    s2 <- userSel$diffClusterCells2
-    
-    result <- NULL
-    if (userSel$runDiffCalc) {
-        result <- calculate_differentials(filtered_data(), c1, s1, c2, s2)
-        if (is.null(result)) {
-            createAlert(session,
-                        "bodyAlert",
-                        "zeroDiffOutputAlertID",
-                        style   = "warning",
-                        content = paste("Differential Analysis resulted in no output for the current selections and logFC > ",
-                                        g_differential_logfc_threshold),
-                        append  = FALSE)
-        }
-    }
-    result
-})
-
+# top10_genes <- reactive({
+#     get_top_genes_data(userData$object, "top10")
+# })
+# 
+# top30_genes <- reactive({
+#     get_top_genes_data(userData$object, "top30")
+# })
+# 
+# differentials_table_content <- reactive({
+#     c1 <- userSel$diffCluster1
+#     s1 <- userSel$diffClusterCells1
+#     c2 <- userSel$diffCluster2
+#     s2 <- userSel$diffClusterCells2
+#     
+#     result <- NULL
+#     if (userSel$runDiffCalc) {
+#         result <- calculate_differentials(filtered_data(), c1, s1, c2, s2)
+#         if (is.null(result)) {
+#             createAlert(session,
+#                         "bodyAlert",
+#                         "zeroDiffOutputAlertID",
+#                         style   = "warning",
+#                         content = paste("Differential Analysis resulted in no output for the current selections and logFC > ",
+#                                         g_differential_logfc_threshold),
+#                         append  = FALSE)
+#         }
+#     }
+#     result
+# })
+# 
 
 # plot name reactives
 
-base_filename <- reactive({
-    current_time <- format(Sys.time(), "%Y.%m.%d_%H.%M")
-    paste0(current_time, "_SCV")
-})
+# base_filename <- reactive({
+#     current_time <- format(Sys.time(), "%Y.%m.%d_%H.%M")
+#     paste0(current_time, "_SCV")
+# })
+# 
+# base_plot_filename <- reactive({
+#     paste0(base_filename(), "_", userData$object$meta$object_name)
+# })
+# 
+# overview_plot_filename <- reactive({
+#     paste0(base_plot_filename(), "_Overview")
+# })
+# 
+# scatter_plot_filename <- reactive({
+#     paste0(base_plot_filename(), "_Scatter")
+# })
+# 
+# violin_plot_filename <- reactive({
+#     paste0(base_plot_filename(), "_Violin")
+# })
+# 
+# dot_plot_filename <- reactive({
+#     paste0(base_plot_filename(), "_Dot")
+# })
 
-base_plot_filename <- reactive({
-    paste0(base_filename(), "_", userData$object$meta$object_name)
-})
-
-overview_plot_filename <- reactive({
-    paste0(base_plot_filename(), "_Overview")
-})
-
-scatter_plot_filename <- reactive({
-    paste0(base_plot_filename(), "_Scatter")
-})
-
-violin_plot_filename <- reactive({
-    paste0(base_plot_filename(), "_Violin")
-})
-
-dot_plot_filename <- reactive({
-    paste0(base_plot_filename(), "_Dot")
-})
-
-heatmap_filename <- reactive({
-    paste0(base_plot_filename(), "_Heatmap")
-})
-
-differentials1_plot_filename <- reactive({
-    paste0(base_plot_filename(), "_Differentials1")
-})
-
-differentials2_plot_filename <- reactive({
-    paste0(base_plot_filename(), "_Differentials2")
-})
+# heatmap_filename <- reactive({
+#     paste0(base_plot_filename(), "_Heatmap")
+# })
+# 
+# differentials1_plot_filename <- reactive({
+#     paste0(base_plot_filename(), "_Differentials1")
+# })
+# 
+# differentials2_plot_filename <- reactive({
+#     paste0(base_plot_filename(), "_Differentials2")
+# })
 
 # download filenames for tables
 
-top10_DE_filename <- reactive({
-    get_top_DE_download_filename(userData$object$meta$object_name, "_Top10DE_Genes")
-})
-
-top30_DE_filename <- reactive({
-    get_top_DE_download_filename(userData$object$meta$object_name, "_Top30DE_Genes")
-})
-
-differentials_filename <- reactive({
-    get_differentials_filename(userData$object$meta$object_name)
-})
+# top10_DE_filename <- reactive({
+#     get_top_DE_download_filename(userData$object$meta$object_name, "_Top10DE_Genes")
+# })
+# 
+# top30_DE_filename <- reactive({
+#     get_top_DE_download_filename(userData$object$meta$object_name, "_Top30DE_Genes")
+# })
+# 
+# differentials_filename <- reactive({
+#     get_differentials_filename(userData$object$meta$object_name)
+# })
 
 # -- MODULES --
-callModule(downloadableTable, "top10DE", ss_userAction.Log,
-           filenameroot     = top10_DE_filename,
-           downloaddatafxns = list(csv = top10_genes,
-                                   tsv = top10_genes),
-           tabledata        = top10_genes,
-           rownames         = FALSE)
-
-callModule(downloadFile,     "top30DE", ss_userAction.Log,
-           filenameroot     = top30_DE_filename,
-           datafxns         = c(csv = top30_genes,
-                                tsv = top30_genes))
-
-callModule(heatmap_downloadableTable, "differentialsTable", ss_userAction.Log,
-           filenameroot     = differentials_filename,
-           downloaddatafxns = list(csv = differentials_table_content,
-                                   tsv = differentials_table_content),
-           tabledata        = differentials_table_content,
-           rownames         = FALSE)
+# callModule(downloadableTable, "top10DE", ss_userAction.Log,
+#            filenameroot     = top10_DE_filename,
+#            downloaddatafxns = list(csv = top10_genes,
+#                                    tsv = top10_genes),
+#            tabledata        = top10_genes,
+#            rownames         = FALSE)
+# 
+# callModule(downloadFile,     "top30DE", ss_userAction.Log,
+#            filenameroot     = top30_DE_filename,
+#            datafxns         = c(csv = top30_genes,
+#                                 tsv = top30_genes))
+# 
+# callModule(heatmap_downloadableTable, "differentialsTable", ss_userAction.Log,
+#            filenameroot     = differentials_filename,
+#            downloaddatafxns = list(csv = differentials_table_content,
+#                                    tsv = differentials_table_content),
+#            tabledata        = differentials_table_content,
+#            rownames         = FALSE)
 
 # ----------------------------------------
 # --          SHINY SERVER CODE         --
@@ -370,14 +372,15 @@ output$cxOverviewPlot <- renderCanvasXpress({
 #SeuratPlot
 output$seuratVlnPlot <- renderPlot({
     #plot <- makeVlnPlot(filtered_data())
-    plot <- makeVlnPlot(obj,
+    #req(obj)
+    plot <- makeVlnPlot(obj(),
                         features = input$vlnFeatures,
                         splits = input$vlnSplit)
     return(plot)
 })
 
 output$seuratDimPlot <- renderPlot({
-    plot <- makeDimPlot(obj,
+    plot <- makeDimPlot(obj(),
                         reduction = input$dimPlotReduction,
                         groups = input$dimPlotGroups,
                         splits = input$dimPlotSplits)
@@ -387,7 +390,7 @@ output$seuratDimPlot <- renderPlot({
 })
 
 output$seuratFeaturePlot <- renderPlot({
-    plot <- makeFeaturePlot(obj,
+    plot <- makeFeaturePlot(obj(),
                             features = input$featurePlotFeature,
                             reduction = input$dimPlotReduction,
                             splits = input$dimPlotSplits)
@@ -408,12 +411,16 @@ output$FeaturePlotLabel <- renderText({
 
 #tables
 output$markerTable <- renderDataTable({
-    return(datatable(obj@meta.data, filter = "top",
+    dt <- datatable(obj()@misc$markers, filter = "top",
                      extensions = 'Buttons',
                      options = list(
                          dom = 'Blfrtip',
                          buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
-                     )))#Change to the real marker table
+                     ))
+    dt <- formatRound(dt, columns = c("p_val",
+                                      "avg_logFC",
+                                      "p_val_adj"))
+    return(dt)#Not sure if I should round here
 })
 
 
@@ -610,30 +617,95 @@ observeEvent(input$fileModalClosed, {
     userData$modalOpen <- FALSE
 })
 
-# File upload has finished
-observeEvent(input$fileInputDialog, {
-    input_file <- input$fileInputDialog
-    if (!is.null(input_file)) {
-        load_data_result <- load_data(input_file)
-        error_messages   <- load_data_result[["errors"]]
-        if (is.null(error_messages)) {
-            userData$objectId       <- userData$objectId + 1
-            userData$object         <- load_data_result[["object"]]
-            userData$filteredObject <- NULL
-            disable_plots()
-        }
-        
-        if (userData$modalOpen) {
-            toggleModal(session, "loading_modal", toggle = "close")
-            userData$modalOpen <- FALSE
-        }
-        
-        if (!is.null(error_messages)) {
-            output$loading_error_message <- renderText({get_file_dialog_error_message(input_file, error_messages)})
-            toggleModal(session, "file_error_modal", toggle = "open")
-        }
-    }
+#############################
+#Update the data object being loaded
+obj <- reactive({
+    readRDS(input$objectInput$datapath)
 })
+
+#Update the different control ui based on the new object
+
+#vln qc
+observeEvent(input$objectInput, {
+    updateSelectizeInput(session, 
+                         "vlnFeatures",
+                         choices = colnames(obj()@meta.data),
+                         selected = c("nCount_RNA"))
+})
+
+#vln qc
+observeEvent(input$objectInput, {
+    updateSelectizeInput(session, 
+                         "vlnSplit",
+                         choices = colnames(obj()@meta.data),
+                         selected = c("orig.ident"))
+})
+
+#Dimplot 
+observeEvent(input$objectInput, {
+    updateSelectizeInput(session, 
+                         "dimPlotReduction",
+                         choices = names(obj()@reductions),
+                         selected = c("tsne"))
+})
+
+observeEvent(input$objectInput, {
+    updateSelectizeInput(session, 
+                         "dimPlotGroup",
+                         choices = colnames(obj()@meta.data),
+                         selected = c("seurat_clusters"))
+})
+
+observeEvent(input$objectInput, {
+    updateSelectizeInput(session, 
+                         "dimPlotSplit",
+                         choices = colnames(obj()@meta.data))
+})
+
+#FeaturePlot
+observeEvent(input$objectInput, {
+    updateSelectizeInput(session, 
+                         "featurePlotFeature",
+                         choices = rownames(obj()[["RNA"]]@counts),#Change to handle other slots later
+                         selected = VariableFeatures(obj())[1],
+                         server = TRUE)
+})
+
+observeEvent(input$objectInput, {
+    updateSelectizeInput(session, 
+                         "featurePlotSlot",
+                         choices = names(obj()@assays),#Change to handle other slots later
+                         selected = c("RNA"))
+})
+
+
+# File upload has finished
+# observeEvent(input$fileInputDialog, {
+#     input_file <- input$fileInputDialog
+#     obj <- readRDS(input_file)###
+#     return(obj)
+#     if (!is.null(input_file)) {
+#         load_data_result <- load_data(input_file)
+#         #return(load_data_result)#Just Returning the Seurat object
+#         error_messages   <- load_data_result[["errors"]]
+#         if (is.null(error_messages)) {
+#             userData$objectId       <- userData$objectId + 1
+#             userData$object         <- load_data_result[["object"]]
+#             userData$filteredObject <- NULL
+#             disable_plots()
+#         }
+#         
+#         if (userData$modalOpen) {
+#             toggleModal(session, "loading_modal", toggle = "close")
+#             userData$modalOpen <- FALSE
+#         }
+#         
+#         if (!is.null(error_messages)) {
+#             output$loading_error_message <- renderText({get_file_dialog_error_message(input_file, error_messages)})
+#             toggleModal(session, "file_error_modal", toggle = "open")
+#         }
+#     }
+# })
 
 # About app link clicked
 observeEvent(input$about_link, {
