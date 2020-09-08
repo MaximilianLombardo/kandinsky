@@ -106,6 +106,10 @@ body2 <- box(id          = "bodyElement2",
                              dimPlot_ctrl_row_ui,
                              dimpPlot_row_ui,
                              dimPlotMarkerTable_ui),
+                    tabPanel("Cell Signalling",
+                             chord_ctrl_row_ui,
+                             chord_row_ui,
+                             chord_table_ui),
                     tabPanel("testPanel",
                              vln_ctrl_row_ui
                              )

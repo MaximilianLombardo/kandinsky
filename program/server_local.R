@@ -423,6 +423,20 @@ output$markerTable <- renderDataTable({
     return(dt)#Not sure if I should round here
 })
 
+#Chord Diagram
+output$chordDiagram <- renderPlot({
+    makeChordDiagram(obj(), input$clusterNumber)
+})
+
+output$chordTable <- renderDataTable({
+    dt <- datatable(obj()@misc$signalling, filter = "top",
+                    extensions = 'Buttons',
+                    options = list(
+                        dom = 'Blfrtip',
+                        buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+                    ))
+})
+
 
 output$cxScatterPlot <- renderCanvasXpress({
     plot <- NULL
@@ -678,6 +692,11 @@ observeEvent(input$objectInput, {
                          selected = c("RNA"))
 })
 
+observeEvent(input$objectInput, {
+    updateSelectizeInput(session, 
+                         "clusterNumber",
+                         choices = levels(obj()@active.ident))
+})
 
 # File upload has finished
 # observeEvent(input$fileInputDialog, {

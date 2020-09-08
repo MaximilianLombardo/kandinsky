@@ -25,7 +25,8 @@ source('program/fxn/supporting_data.R')
 source('program/fxn/supporting_plots.R')
 source('program/fxn/supporting_misc.R')
 source('program/fxn/diff_expression.R')
-#source('program/uiElements/qcUI.R')
+source('program/fxn/chord_diagram.R')
+source('program/uiElements/qcUI.R')
 
 # Variables
 

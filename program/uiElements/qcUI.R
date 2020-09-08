@@ -1,19 +1,19 @@
-observe()
+#observe()
 vln_ctrl_row_ui <- fluidRow(
     column(
         width = 3,
         selectizeInput("vlnFeatures",
                        label = "QC Violin Plot Features",
-                       choices = colnames(obj()@meta.data),
-                       selected = c("nCount_RNA"),
+                       choices = NULL,#colnames(obj()@meta.data),
+                       selected = NULL,#c("nCount_RNA"),
                        multiple = TRUE,
                        width = "100%")),
     column(
         width = 3,
         selectizeInput("vlnSplit",
                        label = "QC Violin Plot Grouping Variable",
-                       choices = colnames(obj()@meta.data),
-                       selected = c("orig.ident"),
+                       choices = NULL,#colnames(obj()@meta.data),
+                       selected = NULL,#c("orig.ident"),
                        multiple = FALSE,
                        width = "100%"))
 )
@@ -34,21 +34,21 @@ dimPlot_ctrl_row_ui <- fluidRow(
         width = 2,
         selectizeInput("dimPlotReduction",
                        label = "Dim Plot Reduction",
-                       choices = names(obj()@reductions),
+                       choices = NULL,#names(obj()@reductions),
                        multiple = FALSE,
                        width = "100%")),
     column(
         width = 2,
         selectizeInput("dimPlotGroup",
                        label = "Grouping Variable",
-                       choices = colnames(obj()@meta.data),
+                       choices = NULL,#colnames(obj()@meta.data),
                        multiple = FALSE,
                        width = "100%")),
     column(
         width = 2,
         selectizeInput("dimPlotSplit",
                        label = "Splitting Variable",
-                       choices = colnames(obj()@meta.data),
+                       choices = NULL,#colnames(obj()@meta.data),
                        multiple = FALSE,
                        width = "100%")),
     column(
@@ -56,14 +56,14 @@ dimPlot_ctrl_row_ui <- fluidRow(
         selectizeInput("featurePlotFeature",
                        label = "Gene to Plot",
                        choices = NULL,#rownames(obj()[["RNA"]]@counts),#Change to handle other slots later
-                       selected = VariableFeatures(obj())[1],
+                       selected = NULL,#VariableFeatures(obj())[1],
                        multiple = TRUE,
                        width = "100%")),
     column(
         width = 3,
         selectizeInput("featurePlotSlot",
                        label = "Normalization Method",
-                       choices = names(obj()@assays),#Change to handle other slots later
+                       choices = NULL,#names(obj()@assays),#Change to handle other slots later
                        selected = c("RNA"),
                        multiple = FALSE,
                        width = "100%"))
@@ -86,4 +86,35 @@ dimPlotMarkerTable_ui <- fluidRow(
     column(
         width = 12,
         dataTableOutput('markerTable'))
+)
+#############################################################
+chord_ctrl_row_ui <- fluidRow(
+    column(
+        width = 3,
+        selectizeInput("clusterNumber",
+                       label = "Signalling Cluster",
+                       choices = NULL,#levels(obj()@active.ident),
+                       selected = c("01"),
+                       multiple = FALSE,
+                       width = "100%"))#,
+    # column(
+    #     width = 3,
+    #     selectizeInput("vlnSplit",
+    #                    label = "QC Violin Plot Grouping Variable",
+    #                    choices = colnames(obj()@meta.data),
+    #                    selected = c("orig.ident"),
+    #                    multiple = FALSE,
+    #                    width = "100%"))
+)
+
+chord_row_ui <- fluidRow(
+    column(
+        width = 12,
+        plotOutput("chordDiagram", height = "800px"))
+)
+
+chord_table_ui <- fluidRow(
+    column(
+        width = 12,
+        dataTableOutput("chordTable"))
 )

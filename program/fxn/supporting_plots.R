@@ -466,3 +466,8 @@ makeFeaturePlot <- function(obj, features, reduction, splits){
                         combine = FALSE)#Doing this so we can get rid of the axis labels
     return(plot)
 }
+
+makeChordDiagram <- function(obj, cluster.number){
+    createCustomChordDiagram(obj, cluster.number = cluster.number,
+                             links = obj@misc$signalling)
+}
