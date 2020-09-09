@@ -97,8 +97,10 @@ body2 <- box(id          = "bodyElement2",
              tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
              tabBox(id     = "tabBodyElement2",
                     width  = 12,
-                    selected = "QC",
-                    tabPanel("QC",
+                    selected = "3D UMAP",
+                    tabPanel("3D UMAP",
+                             umap_3d_ui),
+                    tabPanel("Quality Control",
                              vln_ctrl_row_ui,
                              plotOutput("seuratVlnPlot", width = "100%", height = "600px")),
                     tabPanel("Clustering and Feature Visulization",
@@ -111,8 +113,7 @@ body2 <- box(id          = "bodyElement2",
                              chord_row_ui,
                              chord_table_ui),
                     tabPanel("testPanel",
-                             vln_ctrl_row_ui
-                             )
+                             vln_ctrl_row_ui)
                     )
             )
 

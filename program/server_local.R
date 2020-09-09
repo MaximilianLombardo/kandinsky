@@ -437,6 +437,9 @@ output$chordTable <- renderDataTable({
                     ))
 })
 
+output$UMAP3D <- renderPlotly({
+    makeUMAP3DPlot(obj())
+})
 
 output$cxScatterPlot <- renderCanvasXpress({
     plot <- NULL

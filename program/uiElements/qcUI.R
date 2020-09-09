@@ -118,3 +118,10 @@ chord_table_ui <- fluidRow(
         width = 12,
         dataTableOutput("chordTable"))
 )
+
+umap_3d_ui <- fluidRow(
+    column(
+        width = 12,
+        plotlyOutput("UMAP3D", height = "800px")
+    )
+)

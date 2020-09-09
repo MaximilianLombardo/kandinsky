@@ -471,3 +471,41 @@ makeChordDiagram <- function(obj, cluster.number){
     createCustomChordDiagram(obj, cluster.number = cluster.number,
                              links = obj@misc$signalling)
 }
+
+makeHexDimPlot <- function(obj, reduction){
+    obj <- make_hexbin(obj, nbins = sqrt(length(Cells(obj))), 
+                       dimension_reduction = reduction)
+    plot <- plot_hexbin_density(obj)
+    plot <- plot + NoAxes()
+    return(plot)
+}
+
+makeHexFeaturePlot <- function(obj, reduction, feature){
+    obj <- make_hexbin(obj, nbins = sqrt(length(Cells(obj))), 
+                       dimension_reduction = reduction)
+    plot <- plot_hexbin_feature(sce = obj, feature = feature,
+                                type = "scale.data", action = "mean",
+                                title = feature)
+    plot <- plot + NoAxes()
+    return(plot)
+}
+
+makeUMAP3DPlot <- function(obj){
+    #library(plotly)
+    plot <- plot_ly(data = obj@misc$umap3d, 
+                    x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, 
+                    color = ~seurat_clusters,#Keep?
+                    type = "scatter3d", 
+                    mode = "markers", 
+                    marker = list(size = 3, width=2),
+                    showbackground = FALSE,
+                    text=~label,
+                    hoverinfo="text") 
+    return(plot)
+}
+
+makeStackedViolinPlot <- function(obj, features){
+    
+    plot <- StackedVlnPlot(obj, features = features)
+    return(plot)
+}
