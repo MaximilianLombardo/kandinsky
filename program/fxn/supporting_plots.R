@@ -490,6 +490,48 @@ makeHexFeaturePlot <- function(obj, reduction, feature){
     return(plot)
 }
 
+makeScatterSelectionPlot <- function(obj, reduction, feature, do.feature){
+    if(do.feature){
+        plot <- FeaturePlot(obj, features = features,
+                            reduction = reduction) + NoAxes()
+    }else{
+        plot <- DimPlot(obj, reduction = reduction) + NoLegend() + NoAxes()
+    }
+    
+    plot <- plotly::ggplotly(plot, source = "hexsource") %>% layout(dragmode = "lasso")
+    
+    return(plot)
+}
+
+makeHexSelectionPlot <- function(obj, reduction, feature = NULL, do.feature = FALSE){
+    
+    ###
+    ###
+    obj <- make_hexbin(obj, nbins = sqrt(length(Cells(obj))),
+                       dimension_reduction = reduction)
+
+    df <- obj@misc$hexbin$hexbin.matrix
+    
+    
+    if(do.feature){
+        plot <- plot_hexbin_feature(sce = obj, feature = feature,
+                                    type = "scale.data", action = "mean",
+                                    title = feature) + NoAxes()
+        plot <- plot + geom_point(size = 0.1)
+    }else{
+        plot <- plot_hexbin_meta(obj, col = "seurat_clusters",
+                             action = "majority") + NoAxes()
+        plot <- plot + geom_point(size = 0.5)
+        
+    }
+    
+    #don't forget to add dplyr in the requirements
+    plot <- plotly::ggplotly(plot, source = "hexsource") %>% layout(dragmode = "lasso")
+    
+    return(plot)
+}
+
+
 makeUMAP3DPlot <- function(obj){
     #library(plotly)
     plot <- plot_ly(data = obj@misc$umap3d, 
@@ -500,7 +542,18 @@ makeUMAP3DPlot <- function(obj){
                     marker = list(size = 3, width=2),
                     showbackground = FALSE,
                     text=~label,
-                    hoverinfo="text") 
+                    hoverinfo="text")
+    ax <- list(
+        title = "",
+        zeroline = FALSE,
+        showline = FALSE,
+        showticklabels = FALSE,
+        showgrid = FALSE,
+        showspikes = FALSE
+    )
+    
+    plot <- plot %>% layout(scene = list(xaxis=ax,yaxis=ax,zaxis=ax))
+    
     return(plot)
 }
 

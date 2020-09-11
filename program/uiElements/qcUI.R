@@ -118,10 +118,51 @@ chord_table_ui <- fluidRow(
         width = 12,
         dataTableOutput("chordTable"))
 )
-
+####################################################3
 umap_3d_ui <- fluidRow(
     column(
         width = 12,
-        plotlyOutput("UMAP3D", height = "800px")
+        plotly::plotlyOutput("UMAP3D", height = "800px")
+    )
+)
+
+
+###########################
+#Hex Selection Plot UI Elements
+
+hex_select_feature_control_ui <- fluidRow(
+    column(width = 2),
+    column(width = 2),
+    column(
+        width = 2, align = "center",
+        checkboxInput("hexFeatureBool",
+                      label = "Plot Features?",
+                      value = FALSE))
+)
+
+hex_select_control_ui <- fluidRow(
+    column(
+        width = 2,
+        selectizeInput("hexSelectReduction",
+                       label = "Hex Selection Reduction",
+                       choices = NULL,#names(obj()@reductions),
+                       selected = NULL,#"umap",
+                       multiple = FALSE,
+                       width = "100%")),
+    column(width = 2),
+    column(
+        width = 2,
+        selectizeInput("hexSelectFeature",
+                       label = "Hex Selection Feature",
+                       choices = NULL,#rownames(obj()[["RNA"]]@scale.data),
+                       selected = NULL,
+                       multiple = FALSE,
+                       width = "100%"))
+)
+
+hex_select_ui <- fluidRow(
+    column(
+        width = 6,
+        plotly::plotlyOutput("hexSelectionPlot", height = "600px")
     )
 )

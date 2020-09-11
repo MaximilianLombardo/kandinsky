@@ -441,6 +441,35 @@ output$UMAP3D <- renderPlotly({
     makeUMAP3DPlot(obj())
 })
 
+output$hexSelectionPlot <- renderPlotly({
+    plot <- makeHexSelectionPlot(obj = obj(),
+                                 reduction = input$hexSelectReduction,
+                                 feature = input$hexSelectFeature,
+                                 do.feature = input$hexFeatureBool)
+    
+    # plot <- makeScatterSelectionPlot(obj = obj(),
+    #                                  reduction = input$hexSelectReduction,
+    #                                  feature = input$hexSelectFeature,
+    #                                  do.feature = input$hexFeatureBool)
+    
+    #plotly::event_register(plot, 'plotly_selecting')
+    
+    return(plot)
+})
+
+
+
+output$selected <- renderPrint({
+    #req(obj())
+    plotly::event_data("plotly_selected", source = "hexsource")
+    
+    #"this is sample text"
+})
+#output$selectedCellsDimPlot <- <- renderPlot({
+#    makeSelectedCellsDimPlot(obj(), )
+#})
+
+###################################################
 output$cxScatterPlot <- renderCanvasXpress({
     plot <- NULL
     if (userSel$runScatterPlot && !is.null(input$genesSel)) {
@@ -695,10 +724,29 @@ observeEvent(input$objectInput, {
                          selected = c("RNA"))
 })
 
+#Chord Diagram
 observeEvent(input$objectInput, {
     updateSelectizeInput(session, 
                          "clusterNumber",
                          choices = levels(obj()@active.ident))
+})
+
+
+#Hex Selection Plot
+
+observeEvent(input$objectInput, {
+    updateSelectizeInput(session,
+                      "hexSelectReduction",
+                      choices = names(obj()@reductions),
+                      selected = names(obj()@reductions[1]))
+})
+
+observeEvent(input$objectInput, {
+    updateSelectizeInput(session,
+                      inputId = "hexSelectFeature",
+                      choices = rownames(obj()[["RNA"]]@counts),
+                      selected = '',
+                      server = TRUE)
 })
 
 # File upload has finished
